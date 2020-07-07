@@ -29,7 +29,7 @@ object ArraySet : IntrinsicMethod() {
         val elementType = AsmUtil.correctElementType(receiver.type)
         val elementIrType = receiver.irType.getArrayElementType(codegen.context.irBuiltIns)
         expression.getValueArgument(0)!!.accept(codegen, data).materializeAt(Type.INT_TYPE, codegen.context.irBuiltIns.intType)
-        expression.getValueArgument(1)!!.accept(codegen, data).materializeAt(elementType, elementIrType)
+        expression.getValueArgument(1)!!.accept(codegen, data).materializeAt(elementType, elementIrType, true)
         codegen.mv.astore(elementType)
         return codegen.unitValue
     }

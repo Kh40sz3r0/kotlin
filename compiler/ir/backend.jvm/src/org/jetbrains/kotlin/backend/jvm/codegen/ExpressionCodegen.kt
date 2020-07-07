@@ -484,7 +484,7 @@ class ExpressionCodegen(
                 MaterialValue(this, AsmTypes.K_CLASS_ARRAY_TYPE, expression.type)
             }
             else ->
-                MaterialValue(this, callable.asmMethod.returnType, callee.returnType)
+                MaterialValue(this, callable.asmMethod.returnType, callable.actualReturnType)
         }
     }
 
@@ -567,7 +567,7 @@ class ExpressionCodegen(
             if (callee.origin == IrDeclarationOrigin.FIELD_FOR_ENUM_ENTRY) {
                 value.materialize()
             } else {
-                value.materializeAt(fieldType, callee.type)
+                value.materializeAt(fieldType, callee.type, true)
             }
 
             expression.markLineNumber(startOffset = true)
@@ -1007,11 +1007,11 @@ class ExpressionCodegen(
         mv.mark(tryCatchBlockEnd)
         // TODO: generate a common `finally` for try & catch blocks here? Right now this breaks the inliner.
         return object : PromisedValue(this, tryAsmType, aTry.type) {
-            override fun materializeAt(target: Type, irTarget: IrType) {
+            override fun materializeAt(target: Type, irTarget: IrType, allowImplicitCasts: Boolean) {
                 if (savedValue != null) {
                     mv.load(savedValue, tryAsmType)
                     frameMap.leaveTemp(tryAsmType)
-                    super.materializeAt(target, irTarget)
+                    super.materializeAt(target, irTarget, allowImplicitCasts)
                 } else {
                     unitValue.materializeAt(target, irTarget)
                 }

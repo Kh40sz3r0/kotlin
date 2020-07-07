@@ -17,8 +17,12 @@ fun test(array: Array<Base>) {
     }()
 }
 
+// JVM_TEMPLATES:
 // 4 CHECKCAST
 // 1 CHECKCAST kotlin/jvm/functions/Function0
 
 // This checkcast should not be generated
 // 3 CHECKCAST Base
+
+// JVM_IR_TEMPLATES:
+// 0 CHECKCAST

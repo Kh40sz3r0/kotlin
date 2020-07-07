@@ -308,7 +308,7 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
 
         if (callee !is IrSimpleFunction) {
             check(callee is IrConstructor) { "Function must be a simple function or a constructor: ${callee.render()}" }
-            return IrCallableMethod(owner, Opcodes.INVOKESPECIAL, mapSignatureSkipGeneric(callee), false)
+            return IrCallableMethod(owner, Opcodes.INVOKESPECIAL, mapSignatureSkipGeneric(callee), false, callee.returnType)
         }
 
         val isInterface = calleeParent.isJvmInterface
@@ -326,7 +326,7 @@ class MethodSignatureMapper(private val context: JvmBackendContext) {
         val signature = mapOverriddenSpecialBuiltinIfNeeded(caller, declaration, isSuperCall)
             ?: mapSignatureSkipGeneric(declaration)
 
-        return IrCallableMethod(owner, invokeOpcode, signature, isInterface)
+        return IrCallableMethod(owner, invokeOpcode, signature, isInterface, declaration.returnType)
     }
 
     // TODO: get rid of this (probably via some special lowering)

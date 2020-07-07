@@ -21,9 +21,10 @@ import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
 // A value that may not have been fully constructed yet. The ability to "roll back" code generation
 // is useful for certain optimizations.
 abstract class PromisedValue(val codegen: ExpressionCodegen, val type: Type, val irType: IrType) {
+
     // If this value is immaterial, construct an object on the top of the stack. This
     // must always be done before generating other values or emitting raw bytecode.
-    open fun materializeAt(target: Type, irTarget: IrType) {
+    open fun materializeAt(target: Type, irTarget: IrType, allowImplicitCasts: Boolean = false) {
         val erasedSourceType = irType.eraseTypeParameters()
         val erasedTargetType = irTarget.eraseTypeParameters()
         val isFromTypeInlineClass = erasedSourceType.classOrNull!!.owner.isInline
@@ -54,6 +55,14 @@ abstract class PromisedValue(val codegen: ExpressionCodegen, val type: Type, val
         }
 
         if (type != target) {
+            if (allowImplicitCasts && type.sort == Type.OBJECT && target.sort == Type.OBJECT && !irType.isNothing() &&
+                irType.isSubtypeOf(
+                    irTarget,
+                    codegen.context.irBuiltIns
+                )
+            ) {
+                return
+            }
             StackValue.coerce(type, target, mv)
         }
     }
@@ -85,7 +94,7 @@ abstract class BooleanValue(codegen: ExpressionCodegen) :
     abstract fun jumpIfFalse(target: Label)
     abstract fun jumpIfTrue(target: Label)
 
-    override fun materializeAt(target: Type, irTarget: IrType) {
+    override fun materializeAt(target: Type, irTarget: IrType, allowImplicitCasts: Boolean) {
         val const0 = Label()
         val end = Label()
         jumpIfFalse(const0)
@@ -103,7 +112,7 @@ abstract class BooleanValue(codegen: ExpressionCodegen) :
 class BooleanConstant(codegen: ExpressionCodegen, val value: Boolean) : BooleanValue(codegen) {
     override fun jumpIfFalse(target: Label) = if (value) Unit else mv.goTo(target)
     override fun jumpIfTrue(target: Label) = if (value) mv.goTo(target) else Unit
-    override fun materializeAt(target: Type, irTarget: IrType) {
+    override fun materializeAt(target: Type, irTarget: IrType, allowImplicitCasts: Boolean) {
         mv.iconst(if (value) 1 else 0)
         if (Type.BOOLEAN_TYPE != target) {
             StackValue.coerce(Type.BOOLEAN_TYPE, target, mv)

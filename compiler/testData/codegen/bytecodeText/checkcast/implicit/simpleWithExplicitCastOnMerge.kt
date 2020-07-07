@@ -18,6 +18,12 @@ fun test(array: Array<Base>) {
     }()
 }
 
+// JVM_TEMPLATES:
 // 7 CHECKCAST
 // 1 CHECKCAST kotlin/jvm/functions/Function0
 // 6 CHECKCAST Base
+
+// JVM_IR_TEMPLATES:
+// 6 CHECKCAST
+// 6 CHECKCAST Base
+
