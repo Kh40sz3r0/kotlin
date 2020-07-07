@@ -897,6 +897,16 @@ public class IrBytecodeTextTestGenerated extends AbstractIrBytecodeTextTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/bytecodeText/checkcast/implicit"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM_IR, true);
             }
 
+            @TestMetadata("functionCall.kt")
+            public void testFunctionCall() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/functionCall.kt");
+            }
+
+            @TestMetadata("functionCallWithExplicitCastOnMerge.kt")
+            public void testFunctionCallWithExplicitCastOnMerge() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/functionCallWithExplicitCastOnMerge.kt");
+            }
+
             @TestMetadata("generic.kt")
             public void testGeneric() throws Exception {
                 runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/generic.kt");

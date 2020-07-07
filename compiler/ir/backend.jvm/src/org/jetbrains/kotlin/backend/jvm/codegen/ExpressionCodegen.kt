@@ -167,11 +167,11 @@ class ExpressionCodegen(
     fun markLineNumber(element: IrElement) = element.markLineNumber(true)
 
     // TODO remove
-    fun gen(expression: IrExpression, type: Type, irType: IrType, data: BlockInfo): StackValue {
+    fun gen(expression: IrExpression, type: Type, irType: IrType, data: BlockInfo, allowImplicitCast: Boolean = false): StackValue {
         if (expression.attributeOwnerId === context.fakeContinuation) {
             addFakeContinuationMarker(mv)
         } else {
-            expression.accept(this, data).materializeAt(type, irType)
+            expression.accept(this, data).materializeAt(type, irType, allowImplicitCast)
         }
         return StackValue.onStack(type, irType.toKotlinType())
     }
@@ -424,7 +424,8 @@ class ExpressionCodegen(
 
         expression.dispatchReceiver?.let { receiver ->
             val type = if ((expression as? IrCall)?.superQualifierSymbol != null) receiver.asmType else callable.owner
-            callGenerator.genValueAndPut(callee.dispatchReceiverParameter!!, receiver, type, this, data)
+            // Type mapper could use more specific type for invoke instruction and it  will cause inconsistency between irType and asmType below (see kt10822.kt)
+            callGenerator.genValueAndPut(callee.dispatchReceiverParameter!!, receiver, type, this, data, false)
         }
 
         expression.extensionReceiver?.let { receiver ->

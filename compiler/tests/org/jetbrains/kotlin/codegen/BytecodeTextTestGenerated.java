@@ -897,6 +897,16 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/bytecodeText/checkcast/implicit"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM, true);
             }
 
+            @TestMetadata("functionCall.kt")
+            public void testFunctionCall() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/functionCall.kt");
+            }
+
+            @TestMetadata("functionCallWithExplicitCastOnMerge.kt")
+            public void testFunctionCallWithExplicitCastOnMerge() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/functionCallWithExplicitCastOnMerge.kt");
+            }
+
             @TestMetadata("generic.kt")
             public void testGeneric() throws Exception {
                 runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/generic.kt");

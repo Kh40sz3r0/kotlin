@@ -68,14 +68,15 @@ class IrInlineCodegen(
         argumentExpression: IrExpression,
         parameterType: Type,
         codegen: ExpressionCodegen,
-        blockInfo: BlockInfo
+        blockInfo: BlockInfo,
+        allowImplicitCast: Boolean
     ) {
         if (codegen.irFunction.isInvokeSuspendOfContinuation()) {
             // In order to support java interop of inline suspend functions, we generate continuations for these inline suspend functions.
             // These functions should behave as ordinary suspend functions, i.e. we should not inline the content of the inline function
             // into continuation.
             // Thus, we should put its arguments to stack.
-            super.genValueAndPut(irValueParameter, argumentExpression, parameterType, codegen, blockInfo)
+            super.genValueAndPut(irValueParameter, argumentExpression, parameterType, codegen, blockInfo, allowImplicitCast)
         }
 
         val isInlineParameter = irValueParameter.isInlineParameter()
