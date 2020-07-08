@@ -27,8 +27,13 @@ class CoercionValue(
     private val underlyingKotlinType: KotlinType? // type of the underlying parameter for inline class
 ) : StackValue(castType, castKotlinType, value.canHaveSideEffects()) {
 
-    override fun putSelector(type: Type, kotlinType: KotlinType?, v: InstructionAdapter) {
-        value.putSelector(value.type, value.kotlinType, v)
+    override fun putSelector(
+        type: Type,
+        kotlinType: KotlinType?,
+        v: InstructionAdapter,
+        allowImplicitCast: Boolean
+    ) {
+        value.putSelector(value.type, value.kotlinType, v, allowImplicitCast)
 
         // consider the following example:
 
@@ -63,8 +68,13 @@ class StackValueWithLeaveTask(
         stackValue.putReceiver(v, isRead)
     }
 
-    override fun putSelector(type: Type, kotlinType: KotlinType?, v: InstructionAdapter) {
-        stackValue.putSelector(type, kotlinType, v)
+    override fun putSelector(
+        type: Type,
+        kotlinType: KotlinType?,
+        v: InstructionAdapter,
+        allowImplicitCast: Boolean
+    ) {
+        stackValue.putSelector(type, kotlinType, v, allowImplicitCast)
         leaveTasks(stackValue)
     }
 }
@@ -75,9 +85,14 @@ open class OperationStackValue(
     val lambda: (v: InstructionAdapter) -> Unit
 ) : StackValue(resultType, resultKotlinType) {
 
-    override fun putSelector(type: Type, kotlinType: KotlinType?, v: InstructionAdapter) {
+    override fun putSelector(
+        type: Type,
+        kotlinType: KotlinType?,
+        v: InstructionAdapter,
+        allowImplicitCast: Boolean
+    ) {
         lambda(v)
-        coerceTo(type, kotlinType, v)
+        coerceTo(type, kotlinType, v, allowImplicitCast)
     }
 }
 

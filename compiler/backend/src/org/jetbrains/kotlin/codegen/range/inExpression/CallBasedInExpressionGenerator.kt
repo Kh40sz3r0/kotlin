@@ -30,7 +30,12 @@ class CallBasedInExpressionGenerator(
 
     private fun gen(argument: StackValue): BranchedValue =
         object : BranchedValue(argument, null, argument.type, Opcodes.IFEQ) {
-            override fun putSelector(type: Type, kotlinType: KotlinType?, v: InstructionAdapter) {
+            override fun putSelector(
+                type: Type,
+                kotlinType: KotlinType?,
+                v: InstructionAdapter,
+                allowImplicitCast: Boolean
+            ) {
                 invokeFunction(v)
                 coerceTo(type, kotlinType, v)
             }

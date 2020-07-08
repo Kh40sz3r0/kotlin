@@ -36,7 +36,12 @@ class ResourcePropertyStackValue(
         assert(containerOptions.containerType != AndroidContainerType.UNKNOWN)
     }
 
-    override fun putSelector(type: Type, kotlinType: KotlinType?, v: InstructionAdapter) {
+    override fun putSelector(
+        type: Type,
+        kotlinType: KotlinType?,
+        v: InstructionAdapter,
+        allowImplicitCast: Boolean
+    ) {
         val returnTypeString = typeMapper.mapType(resource.type.lowerIfFlexible()).className
         if (AndroidConst.FRAGMENT_FQNAME == returnTypeString || AndroidConst.SUPPORT_FRAGMENT_FQNAME == returnTypeString || AndroidConst.ANDROIDX_SUPPORT_FRAGMENT_FQNAME == returnTypeString) {
             return putSelectorForFragment(v)

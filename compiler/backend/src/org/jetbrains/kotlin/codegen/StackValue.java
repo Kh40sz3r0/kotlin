@@ -102,8 +102,8 @@ public abstract class StackValue {
      * @param v     the visitor used to genClassOrObject the instructions
      * @param depth the number of new values put onto the stack
      */
-    public void moveToTopOfStack(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v, int depth) {
-        put(type, kotlinType, v);
+    public void moveToTopOfStack(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v, int depth, boolean allowImplicitCast) {
+        put(type, kotlinType, v, false, allowImplicitCast);
     }
 
     public final void put(@NotNull InstructionAdapter v) {
@@ -1221,9 +1221,9 @@ public abstract class StackValue {
         }
 
         @Override
-        public void moveToTopOfStack(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v, int depth) {
+        public void moveToTopOfStack(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v, int depth, boolean allowImplicitCast) {
             if (depth == 0) {
-                put(type, kotlinType, v);
+                put(type, kotlinType, v, allowImplicitCast);
             }
             else if (depth == 1) {
                 int size = this.type.getSize();
@@ -1238,7 +1238,7 @@ public abstract class StackValue {
                     throw new UnsupportedOperationException("don't know how to move type " + type + " to top of stack");
                 }
 
-                coerceTo(type, kotlinType, v);
+                coerceTo(type, kotlinType, v, allowImplicitCast);
             }
             else if (depth == 2) {
                 int size = this.type.getSize();
@@ -1254,7 +1254,7 @@ public abstract class StackValue {
                     throw new UnsupportedOperationException("don't know how to move type " + type + " to top of stack");
                 }
 
-                coerceTo(type, kotlinType, v);
+                coerceTo(type, kotlinType, v, allowImplicitCast);
             }
             else {
                 throw new UnsupportedOperationException("unsupported move-to-top depth " + depth);
@@ -1811,7 +1811,7 @@ public abstract class StackValue {
             if (getter == null) {
                 assert fieldName != null : "Property should have either a getter or a field name: " + descriptor;
                 assert backingFieldOwner != null : "Property should have either a getter or a backingFieldOwner: " + descriptor;
-                if (inlineConstantIfNeeded(type, kotlinType, v)) return;
+                if (inlineConstantIfNeeded(type, kotlinType, v, allowImplicitCast)) return;
 
                 v.visitFieldInsn(isStaticPut ? GETSTATIC : GETFIELD,
                                  backingFieldOwner.getInternalName(), fieldName, this.type.getDescriptor());
@@ -1876,19 +1876,29 @@ public abstract class StackValue {
             }
         }
 
-        private boolean inlineConstantIfNeeded(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
+        private boolean inlineConstantIfNeeded(
+                @NotNull Type type,
+                @Nullable KotlinType kotlinType,
+                @NotNull InstructionAdapter v,
+                boolean allowImplicitCast
+        ) {
             if (JvmCodegenUtil.isInlinedJavaConstProperty(descriptor)) {
-                return inlineConstant(type, kotlinType, v);
+                return inlineConstant(type, kotlinType, v, allowImplicitCast);
             }
 
             if (descriptor.isConst() && codegen.getState().getShouldInlineConstVals()) {
-                return inlineConstant(type, kotlinType, v);
+                return inlineConstant(type, kotlinType, v, allowImplicitCast);
             }
 
             return false;
         }
 
-        private boolean inlineConstant(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
+        private boolean inlineConstant(
+                @NotNull Type type,
+                @Nullable KotlinType kotlinType,
+                @NotNull InstructionAdapter v,
+                boolean allowImplicitCast
+        ) {
             assert AsmUtil.isPrimitive(this.type) || AsmTypes.JAVA_STRING_TYPE.equals(this.type) :
                     "Const property should have primitive or string type: " + descriptor;
             assert isStaticPut : "Const property should be static" + descriptor;
@@ -1901,7 +1911,7 @@ public abstract class StackValue {
                 value = ((Double) value).floatValue();
             }
 
-            StackValue.constant(value, this.type, this.kotlinType).putSelector(type, kotlinType, v, false);
+            StackValue.constant(value, this.type, this.kotlinType).putSelector(type, kotlinType, v, allowImplicitCast);
 
             return true;
         }
@@ -2420,7 +2430,7 @@ public abstract class StackValue {
                 @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v,
                 boolean allowImplicitCast
         ) {
-            originalValue.putSelector(type, kotlinType, v, false);
+            originalValue.putSelector(type, kotlinType, v, allowImplicitCast);
         }
 
         @Override

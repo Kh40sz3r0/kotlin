@@ -346,7 +346,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         stackValue = new StackValue(stackValue.type, stackValue.kotlinType) {
             @Override
             public void putSelector(
-                    @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v
+                    @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v,
+                    boolean allowImplicitCast
             ) {
                 stackValueToWrap.put(functionTypeForWrapper, null, v);
                 invokeCoroutineMigrationMethod(
@@ -2474,7 +2475,8 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             coroutineInstanceValue = new StackValue(CoroutineCodegenUtilKt.EXPERIMENTAL_CONTINUATION_ASM_TYPE) {
                 @Override
                 public void putSelector(
-                        @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v
+                        @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v,
+                        boolean allowImplicitCast
                 ) {
                     releaseContinuation.put(CoroutineCodegenUtilKt.RELEASE_CONTINUATION_ASM_TYPE, v);
                     invokeCoroutineMigrationMethod(
@@ -2690,7 +2692,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
         if (!isConstructor) { // otherwise already
             receiver = StackValue.receiver(resolvedCall, receiver, this, callableMethod);
-            receiver.put(receiver.type, receiver.kotlinType, v);
+            receiver.put(receiver.type, receiver.kotlinType, v, false, true);
 
             // In regular cases we add an inline marker just before receiver is loaded (to spill the stack before a suspension)
             // But in case of safe call things we get the following bytecode:
@@ -4596,7 +4598,12 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 arguments.get(1).asElement(),
                 new StackValue(K_PROPERTY_TYPE) {
                     @Override
-                    public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v) {
+                    public void putSelector(
+                            @NotNull Type type,
+                            @Nullable KotlinType kotlinType,
+                            @NotNull InstructionAdapter v,
+                            boolean allowImplicitCast
+                    ) {
                         metadataValue.put(type, kotlinType, v);
                     }
                 }

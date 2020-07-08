@@ -68,7 +68,7 @@ interface CallGenerator {
             }
 
             val value = codegen.gen(argumentExpression)
-            value.put(parameterType.type, parameterType.kotlinType, v)
+            value.put(parameterType.type, parameterType.kotlinType, v, false, true)
 
             if (isVarargInvoke) {
                 v.astore(OBJECT_TYPE)

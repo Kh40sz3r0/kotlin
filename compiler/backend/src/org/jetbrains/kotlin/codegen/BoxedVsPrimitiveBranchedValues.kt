@@ -48,7 +48,12 @@ abstract class SafeCallFusedWithPrimitiveEqualityBase(
         v.mark(endLabel)
     }
 
-    override fun putSelector(type: Type, kotlinType: KotlinType?, v: InstructionAdapter) {
+    override fun putSelector(
+        type: Type,
+        kotlinType: KotlinType?,
+        v: InstructionAdapter,
+        allowImplicitCast: Boolean
+    ) {
         val falseLabel = Label()
         val endLabel = Label()
 
