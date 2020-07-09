@@ -912,6 +912,11 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
                 runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/generic.kt");
             }
 
+            @TestMetadata("lambdaAsParameter.kt")
+            public void testLambdaAsParameter() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/lambdaAsParameter.kt");
+            }
+
             @TestMetadata("simple.kt")
             public void testSimple() throws Exception {
                 runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/simple.kt");

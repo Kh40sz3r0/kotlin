@@ -293,6 +293,7 @@ public class ClosureCodegen extends MemberCodegen<KtElement> {
     public StackValue putInstanceOnStack(@NotNull ExpressionCodegen codegen, @Nullable StackValue functionReferenceReceiver) {
         return StackValue.operation(
                 functionReferenceTarget != null ? K_FUNCTION : asmType,
+                classDescriptor.getDefaultType(),
                 v -> {
                     if (isConst(closure)) {
                         v.getstatic(asmType.getInternalName(), JvmAbi.INSTANCE_FIELD, asmType.getDescriptor());
