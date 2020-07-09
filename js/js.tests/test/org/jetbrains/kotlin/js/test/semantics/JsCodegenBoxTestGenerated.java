@@ -2760,6 +2760,11 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             runTest("compiler/testData/codegen/box/checkcastOptimization/genereicParamDowncast.kt");
         }
 
+        @TestMetadata("genericProperty.kt")
+        public void testGenericProperty() throws Exception {
+            runTest("compiler/testData/codegen/box/checkcastOptimization/genericProperty.kt");
+        }
+
         @TestMetadata("kt19128.kt")
         public void testKt19128() throws Exception {
             runTest("compiler/testData/codegen/box/checkcastOptimization/kt19128.kt");
