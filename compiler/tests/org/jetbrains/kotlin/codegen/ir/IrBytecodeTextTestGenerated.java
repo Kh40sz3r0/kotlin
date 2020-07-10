@@ -917,6 +917,11 @@ public class IrBytecodeTextTestGenerated extends AbstractIrBytecodeTextTest {
                 runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/lambdaAsParameter.kt");
             }
 
+            @TestMetadata("return.kt")
+            public void testReturn() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/return.kt");
+            }
+
             @TestMetadata("simple.kt")
             public void testSimple() throws Exception {
                 runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/simple.kt");

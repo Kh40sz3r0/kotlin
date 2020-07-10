@@ -751,7 +751,7 @@ class ExpressionCodegen(
 
         val returnType = if (owner == irFunction) signature.returnType else methodSignatureMapper.mapReturnType(owner)
         val afterReturnLabel = Label()
-        expression.value.accept(this, data).materializeAt(returnType, owner.returnType)
+        expression.value.accept(this, data).materializeAt(returnType, owner.returnType, true)
         generateFinallyBlocksIfNeeded(returnType, afterReturnLabel, data)
         expression.markLineNumber(startOffset = true)
         if (isNonLocalReturn) {

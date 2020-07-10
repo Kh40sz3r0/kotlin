@@ -2698,6 +2698,11 @@ public class IrCompileKotlinAgainstInlineKotlinTestGenerated extends AbstractIrC
             KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/boxInline/optimizations"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM_IR, true);
         }
 
+        @TestMetadata("checkcast.kt")
+        public void testCheckcast() throws Exception {
+            runTest("compiler/testData/codegen/boxInline/optimizations/checkcast.kt");
+        }
+
         @TestMetadata("kt20844.kt")
         public void testKt20844() throws Exception {
             runTest("compiler/testData/codegen/boxInline/optimizations/kt20844.kt");

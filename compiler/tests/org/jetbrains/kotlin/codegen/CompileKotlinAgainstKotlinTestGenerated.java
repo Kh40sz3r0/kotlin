@@ -539,6 +539,19 @@ public class CompileKotlinAgainstKotlinTestGenerated extends AbstractCompileKotl
                 public void testNewSchemeWithJvmDefault() throws Exception {
                     runTest("compiler/testData/compileKotlinAgainstKotlin/jvm8/defaults/interop/newSchemeWithJvmDefault.kt");
                 }
+
+                @TestMetadata("compiler/testData/compileKotlinAgainstKotlin/jvm8/defaults/interop/.idea")
+                @TestDataPath("$PROJECT_ROOT")
+                @RunWith(JUnit3RunnerWithInners.class)
+                public static class _idea extends AbstractCompileKotlinAgainstKotlinTest {
+                    private void runTest(String testDataFilePath) throws Exception {
+                        KotlinTestUtils.runTest(this::doTest, this, testDataFilePath);
+                    }
+
+                    public void testAllFilesPresentIn_idea() throws Exception {
+                        KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/compileKotlinAgainstKotlin/jvm8/defaults/interop/.idea"), Pattern.compile("^(.+)\\.kt$"), null, true);
+                    }
+                }
             }
         }
 
