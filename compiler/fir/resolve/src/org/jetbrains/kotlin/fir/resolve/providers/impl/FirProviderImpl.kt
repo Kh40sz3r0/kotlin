@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -41,7 +41,11 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: KotlinSc
     }
 
     override fun getTopLevelCallableSymbols(packageFqName: FqName, name: Name): List<FirCallableSymbol<*>> {
-        return (state.callableMap[CallableId(packageFqName, null, name)] ?: emptyList())
+        return getCachedTopLevelCallableSymbolsOrNull(packageFqName, name) ?: emptyList()
+    }
+
+    fun getCachedTopLevelCallableSymbolsOrNull(packageFqName: FqName, name: Name): List<FirCallableSymbol<*>>? {
+        return state.callableMap[CallableId(packageFqName, null, name)]
     }
 
     override fun getNestedClassifierScope(classId: ClassId): FirScope? {
@@ -76,12 +80,6 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: KotlinSc
         klass.accept(FirRecorder, state to owner.file)
     }
 
-    override fun getAllCallableNamesInPackage(): Set<Name> {
-        return state.callableMap.keys.asSequence()
-            .filter { it.className == null }
-            .mapTo(mutableSetOf()) { it.callableName }
-    }
-
     private val FirAnnotatedDeclaration.file: FirFile
         get() = when (this) {
             is FirFile -> this
@@ -96,7 +94,7 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: KotlinSc
         file.acceptChildren(FirRecorder, state to file)
     }
 
-    private object FirRecorder : FirDefaultVisitor<Unit, Pair<State, FirFile>>() {
+    object FirRecorder : FirDefaultVisitor<Unit, Pair<State, FirFile>>() {
         override fun visitElement(element: FirElement, data: Pair<State, FirFile>) {}
 
         override fun visitRegularClass(regularClass: FirRegularClass, data: Pair<State, FirFile>) {
@@ -144,16 +142,26 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: KotlinSc
         }
     }
 
-    private val state = State()
+    private val state = StateImpl()
 
-    private class State {
-        val fileMap = mutableMapOf<FqName, List<FirFile>>()
-        val classifierMap = mutableMapOf<ClassId, FirClassLikeDeclaration<*>>()
-        val classifierContainerFileMap = mutableMapOf<ClassId, FirFile>()
-        val classesInPackage = mutableMapOf<FqName, MutableSet<Name>>()
-        val callableMap = mutableMapOf<CallableId, List<FirCallableSymbol<*>>>()
-        val callableContainerMap = mutableMapOf<FirCallableSymbol<*>, FirFile>()
+    abstract class State {
+        abstract val fileMap: MutableMap<FqName, List<FirFile>>
+        abstract val classifierMap: MutableMap<ClassId, FirClassLikeDeclaration<*>>
+        abstract val classifierContainerFileMap: MutableMap<ClassId, FirFile>
+        abstract val classesInPackage: MutableMap<FqName, MutableSet<Name>>
+        abstract val callableMap: MutableMap<CallableId, List<FirCallableSymbol<*>>>
+        abstract val callableContainerMap: MutableMap<FirCallableSymbol<*>, FirFile>
+    }
 
+    class StateImpl : State() {
+        override val fileMap: MutableMap<FqName, List<FirFile>> = mutableMapOf()
+        override val classifierMap: MutableMap<ClassId, FirClassLikeDeclaration<*>> = mutableMapOf()
+        override val classifierContainerFileMap: MutableMap<ClassId, FirFile> = mutableMapOf()
+        override val classesInPackage: MutableMap<FqName, MutableSet<Name>> = mutableMapOf()
+        override val callableMap: MutableMap<CallableId, List<FirCallableSymbol<*>>> = mutableMapOf()
+        override val callableContainerMap: MutableMap<FirCallableSymbol<*>, FirFile> = mutableMapOf()
+
+        @TestOnly
         fun setFrom(other: State) {
             fileMap.clear()
             classifierMap.clear()
@@ -171,7 +179,11 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: KotlinSc
     }
 
     override fun getFirFilesByPackage(fqName: FqName): List<FirFile> {
-        return state.fileMap[fqName].orEmpty()
+        return getCachedFirFilesByPackage(fqName).orEmpty()
+    }
+
+    fun getCachedFirFilesByPackage(fqName: FqName): List<FirFile>? {
+        return state.fileMap[fqName]
     }
 
     override fun getFirClassifierByFqName(classId: ClassId): FirClassLikeDeclaration<*>? {
@@ -183,7 +195,7 @@ class FirProviderImpl(val session: FirSession, val kotlinScopeProvider: KotlinSc
 
     @TestOnly
     fun ensureConsistent(files: List<FirFile>) {
-        val newState = State()
+        val newState = StateImpl()
         files.forEach { recordFile(it, newState) }
 
         val failures = mutableListOf<String>()

@@ -1,10 +1,11 @@
 /*
- * Copyright 2010-2019 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2020 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
 package org.jetbrains.kotlin.fir.resolve.transformers
 
+import com.intellij.openapi.progress.ProgressManager
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.FirSymbolOwner
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
@@ -58,6 +59,7 @@ fun FirFile.runResolve(toPhase: FirResolvePhase, fromPhase: FirResolvePhase = Fi
     val scopeSession = ScopeSession()
     var currentPhase = fromPhase
     while (currentPhase < toPhase) {
+        ProgressManager.checkCanceled()
         currentPhase = currentPhase.next
         val phaseProcessor = currentPhase.createTransformerBasedProcessorByPhase(session, scopeSession)
         phaseProcessor.processFile(this)
