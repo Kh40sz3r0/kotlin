@@ -1345,7 +1345,7 @@ class RawFirBuilder(
                     source = projectionSource
                 }
             }
-            if (projectionKind == KtProjectionKind.NONE && typeProjection.text == "_") {
+            if (projectionKind == KtProjectionKind.NONE && !stubMode && typeProjection.text == "_") {
                 return FirTypePlaceholderProjection
             }
             val typeReference = typeProjection.typeReference
