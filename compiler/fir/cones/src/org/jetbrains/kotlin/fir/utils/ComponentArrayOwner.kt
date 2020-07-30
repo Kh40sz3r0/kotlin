@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
 @OptIn(Protected::class)
 abstract class ComponentArrayOwner<K : Any, V : Any> : AbstractArrayMapOwner<K, V>() {
     final override val arrayMap: ArrayMap<V> =
-        ArrayMapImpl()
+        ThreadSafeArrayMapImpl()
 
     final override fun registerComponent(tClass: KClass<out K>, value: V) {
         arrayMap[typeRegistry.getId(tClass)] = value

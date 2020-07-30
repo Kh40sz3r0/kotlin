@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.fir.utils
 
+import java.util.concurrent.ConcurrentHashMap
+
 sealed class ArrayMap<T : Any> : Iterable<T> {
     abstract val size: Int
 
@@ -128,4 +130,20 @@ internal class ArrayMapImpl<T : Any> : ArrayMap<T>() {
     }
 
     data class Entry<T>(override val key: Int, override val value: T) : Map.Entry<Int, T>
+}
+
+internal class ThreadSafeArrayMapImpl<T : Any> : ArrayMap<T>() {
+    private val concurrentMap = ConcurrentHashMap<Int, T>()
+    override val size: Int
+        get() = error("Size can not be called for ThreadSafeArrayMapImpl")
+
+    override fun set(index: Int, value: T) {
+        concurrentMap[index] = value
+    }
+
+    override fun get(index: Int): T? {
+        return concurrentMap[index]
+    }
+
+    override fun iterator(): Iterator<T> = concurrentMap.values.iterator()
 }
