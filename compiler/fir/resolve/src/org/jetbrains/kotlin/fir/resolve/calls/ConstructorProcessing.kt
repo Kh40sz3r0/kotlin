@@ -72,10 +72,14 @@ internal fun FirScope.processFunctionsAndConstructorsByName(
         name, session, bodyResolveComponents,
         includeSyntheticConstructors = true,
         includeInnerConstructors = includeInnerConstructors,
-        processor = processor
+        processor = {
+            with(bodyResolveComponents) { it.phasedFir }
+            processor(it)
+        }
     )
 
     processFunctionsByName(name) {
+        with(bodyResolveComponents) { it.phasedFir }
         processor(it)
     }
 }
