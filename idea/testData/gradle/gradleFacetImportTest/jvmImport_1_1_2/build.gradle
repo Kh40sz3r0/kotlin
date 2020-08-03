@@ -14,19 +14,19 @@ url 'https://dl.bintray.com/kotlin/kotlin-dev'
     }
 }
 
-apply plugin: 'kotlin'
-
 repositories {
     mavenCentral()
     maven { url 'https://dl.bintray.com/kotlin/kotlin-dev' }
 }
+
+apply plugin: 'kotlin'
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:1.1.2-5"
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.7"
+    kotlinOptions.jvmTarget = "1.6"
     kotlinOptions.freeCompilerArgs = ["-Xsingle-module", "-Xdump-declarations-to", "tmp"]
 }
 

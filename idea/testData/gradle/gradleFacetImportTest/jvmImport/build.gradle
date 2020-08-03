@@ -8,6 +8,10 @@ buildscript {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 apply plugin: 'kotlin'
 
 dependencies {
