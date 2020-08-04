@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.fir.resolve.transformers.body.resolve
 import com.intellij.openapi.progress.ProcessCanceledException
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.*
+import org.jetbrains.kotlin.fir.contracts.description.*
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.diagnostics.ConeSimpleDiagnostic
 import org.jetbrains.kotlin.fir.diagnostics.ConeStubDiagnostic
@@ -113,6 +114,7 @@ open class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransform
             is FirQualifiedAccessExpression -> {
                 dataFlowAnalyzer.enterQualifiedAccessExpression()
                 result = components.transformQualifiedAccessUsingSmartcastInfo(result)
+                result = components.transformQualifiedAccessUsingConditionalContracts(result)
                 dataFlowAnalyzer.exitQualifiedAccessExpression(result)
             }
             is FirResolvedQualifier -> {
@@ -274,7 +276,8 @@ open class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransform
                 }
             }
         }
-        return completeInference.compose()
+        val result = components.transformQualifiedAccessUsingConditionalContracts(completeInference)
+        return result.compose()
     }
 
     override fun transformBlock(block: FirBlock, data: ResolutionMode): CompositeTransformResult<FirStatement> {
@@ -700,7 +703,7 @@ open class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransform
                     if (newConstKind == null) {
                         @Suppress("UNCHECKED_CAST")
                         constExpression.replaceKind(FirConstKind.Int as FirConstKind<T>)
-                        dataFlowAnalyzer.exitConstExpresion(constExpression as FirConstExpression<*>)
+                        dataFlowAnalyzer.exitConstExpression(constExpression as FirConstExpression<*>)
                         constExpression.resultType = buildErrorTypeRef {
                             source = constExpression.source
                             diagnostic = ConeTypeMismatchError(expectedType, integerLiteralType.getApproximatedType())
@@ -717,7 +720,7 @@ open class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransform
             else -> kind.expectedConeType()
         }
 
-        dataFlowAnalyzer.exitConstExpresion(constExpression as FirConstExpression<*>)
+        dataFlowAnalyzer.exitConstExpression(constExpression as FirConstExpression<*>)
         constExpression.resultType = constExpression.resultType.resolvedTypeFromPrototype(type)
         return constExpression.compose()
     }

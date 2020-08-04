@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.builder.FirResolvedReifiedParameterReferenceBuilder
 import org.jetbrains.kotlin.fir.expressions.builder.buildExpressionWithSmartcast
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
-import org.jetbrains.kotlin.fir.typeContext
 import org.jetbrains.kotlin.fir.references.FirErrorNamedReference
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 import org.jetbrains.kotlin.fir.references.FirSuperReference
@@ -26,10 +25,8 @@ import org.jetbrains.kotlin.fir.resolve.calls.ImplicitDispatchReceiverValue
 import org.jetbrains.kotlin.fir.resolve.diagnostics.ConeUnresolvedNameError
 import org.jetbrains.kotlin.fir.resolve.providers.FirProvider
 import org.jetbrains.kotlin.fir.resolve.providers.FirSymbolProvider
-import org.jetbrains.kotlin.fir.resolve.providers.bindSymbolToLookupTag
 import org.jetbrains.kotlin.fir.resolve.providers.getSymbolByTypeRef
 import org.jetbrains.kotlin.fir.resolve.substitution.AbstractConeSubstitutor
-import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.resultType
 import org.jetbrains.kotlin.fir.scopes.impl.FirDeclaredMemberScopeProvider
 import org.jetbrains.kotlin.fir.scopes.impl.withReplacedConeType
@@ -369,22 +366,34 @@ private fun BodyResolveComponents.typeFromSymbol(symbol: AbstractFirBasedSymbol<
     }
 }
 
-fun BodyResolveComponents.transformQualifiedAccessUsingSmartcastInfo(qualifiedAccessExpression: FirQualifiedAccessExpression): FirQualifiedAccessExpression {
-    val typesFromSmartCast = dataFlowAnalyzer.getTypeUsingSmartcastInfo(qualifiedAccessExpression) ?: return qualifiedAccessExpression
-    val allTypes = typesFromSmartCast.also {
-        it += qualifiedAccessExpression.resultType.coneType
+fun BodyResolveComponents.transformQualifiedAccessUsingSmartcastInfo(qualifiedAccess: FirQualifiedAccessExpression): FirQualifiedAccessExpression {
+    val typesFromSmartCast = dataFlowAnalyzer.getTypeUsingSmartcastInfo(qualifiedAccess) ?: return qualifiedAccess
+    return transformQualifiedAccessUsingNewTypes(qualifiedAccess, typesFromSmartCast)
+}
+
+fun BodyResolveComponents.transformQualifiedAccessUsingConditionalContracts(qualifiedAccess: FirQualifiedAccessExpression): FirQualifiedAccessExpression {
+    val typesFromContracts = dataFlowAnalyzer.getTypeUsingConditionalContracts(qualifiedAccess) ?: return qualifiedAccess
+    return transformQualifiedAccessUsingNewTypes(qualifiedAccess, typesFromContracts)
+}
+
+fun BodyResolveComponents.transformQualifiedAccessUsingNewTypes(
+    qualifiedAccess: FirQualifiedAccessExpression,
+    newTypes: MutableList<ConeKotlinType>
+): FirQualifiedAccessExpression {
+    val allTypes = newTypes.also {
+        it += qualifiedAccess.resultType.coneType
     }
     val intersectedType = ConeTypeIntersector.intersectTypes(inferenceComponents.ctx, allTypes)
     // TODO: add check that intersectedType is not equal to original type
     val intersectedTypeRef = buildResolvedTypeRef {
-        source = qualifiedAccessExpression.resultType.source?.fakeElement(FirFakeSourceElementKind.SmartCastedTypeRef)
+        source = qualifiedAccess.resultType.source?.fakeElement(FirFakeSourceElementKind.SmartCastedTypeRef)
         type = intersectedType
-        annotations += qualifiedAccessExpression.resultType.annotations
+        annotations += qualifiedAccess.resultType.annotations
     }
     return buildExpressionWithSmartcast {
-        originalExpression = qualifiedAccessExpression
+        originalExpression = qualifiedAccess
         typeRef = intersectedTypeRef
-        this.typesFromSmartCast = typesFromSmartCast
+        typesFromSmartCast = newTypes
     }
 }
 

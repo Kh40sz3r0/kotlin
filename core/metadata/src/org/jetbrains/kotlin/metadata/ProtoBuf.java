@@ -24013,6 +24013,14 @@ public final class ProtoBuf {
        * </pre>
        */
       RETURNS_NOT_NULL(2, 2),
+      /**
+       * <code>PARAMETERS_IMPLIES = 3;</code>
+       *
+       * <pre>
+       * (boolean condition)
+       * </pre>
+       */
+      PARAMETERS_IMPLIES(3, 3),
       ;
 
       /**
@@ -24839,6 +24847,7 @@ public final class ProtoBuf {
      * <pre>
      * stored as index in valueParameters list of owner-function in 1-indexation
      * Index '0' is reserved for extension receiver
+     * Index 'Int.MAX_VALUE' is reserved for return value
      * </pre>
      */
     int getValueParameterReference();
@@ -25204,6 +25213,7 @@ public final class ProtoBuf {
      * <pre>
      * stored as index in valueParameters list of owner-function in 1-indexation
      * Index '0' is reserved for extension receiver
+     * Index 'Int.MAX_VALUE' is reserved for return value
      * </pre>
      */
     public int getValueParameterReference() {
@@ -25816,6 +25826,7 @@ public final class ProtoBuf {
        * <pre>
        * stored as index in valueParameters list of owner-function in 1-indexation
        * Index '0' is reserved for extension receiver
+       * Index 'Int.MAX_VALUE' is reserved for return value
        * </pre>
        */
       public int getValueParameterReference() {
@@ -25827,6 +25838,7 @@ public final class ProtoBuf {
        * <pre>
        * stored as index in valueParameters list of owner-function in 1-indexation
        * Index '0' is reserved for extension receiver
+       * Index 'Int.MAX_VALUE' is reserved for return value
        * </pre>
        */
       public Builder setValueParameterReference(int value) {
