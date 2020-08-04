@@ -865,6 +865,11 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
             KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/bytecodeText/checkcast"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM, true);
         }
 
+        @TestMetadata("kt13747.kt")
+        public void testKt13747() throws Exception {
+            runTest("compiler/testData/codegen/bytecodeText/checkcast/kt13747.kt");
+        }
+
         @TestMetadata("kt14811.kt")
         public void testKt14811() throws Exception {
             runTest("compiler/testData/codegen/bytecodeText/checkcast/kt14811.kt");
@@ -910,6 +915,16 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
             @TestMetadata("generic.kt")
             public void testGeneric() throws Exception {
                 runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/generic.kt");
+            }
+
+            @TestMetadata("kt16446.kt")
+            public void testKt16446() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/kt16446.kt");
+            }
+
+            @TestMetadata("kt18939.kt")
+            public void testKt18939() throws Exception {
+                runTest("compiler/testData/codegen/bytecodeText/checkcast/implicit/kt18939.kt");
             }
 
             @TestMetadata("lambdaAsParameter.kt")
