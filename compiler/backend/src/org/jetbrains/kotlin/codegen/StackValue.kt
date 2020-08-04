@@ -31,9 +31,9 @@ class CoercionValue(
         type: Type,
         kotlinType: KotlinType?,
         v: InstructionAdapter,
-        allowImplicitCast: Boolean
+        allowNoUpcast: Boolean
     ) {
-        value.putSelector(value.type, value.kotlinType, v, allowImplicitCast)
+        value.putSelector(value.type, value.kotlinType, v, allowNoUpcast)
 
         // consider the following example:
 
@@ -72,9 +72,9 @@ class StackValueWithLeaveTask(
         type: Type,
         kotlinType: KotlinType?,
         v: InstructionAdapter,
-        allowImplicitCast: Boolean
+        allowNoUpcast: Boolean
     ) {
-        stackValue.putSelector(type, kotlinType, v, allowImplicitCast)
+        stackValue.putSelector(type, kotlinType, v, allowNoUpcast)
         leaveTasks(stackValue)
     }
 }
@@ -89,10 +89,10 @@ open class OperationStackValue(
         type: Type,
         kotlinType: KotlinType?,
         v: InstructionAdapter,
-        allowImplicitCast: Boolean
+        allowNoUpcast: Boolean
     ) {
         lambda(v)
-        coerceTo(type, kotlinType, v, allowImplicitCast)
+        coerceTo(type, kotlinType, v, allowNoUpcast)
     }
 }
 

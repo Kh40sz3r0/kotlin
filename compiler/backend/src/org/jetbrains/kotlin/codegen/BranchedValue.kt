@@ -26,7 +26,7 @@ open class BranchedValue(
         type: Type,
         kotlinType: KotlinType?,
         v: InstructionAdapter,
-        allowImplicitCast: Boolean
+        allowNoUpcast: Boolean
     ) {
         val branchJumpLabel = Label()
         condJump(branchJumpLabel, v, true)
@@ -75,7 +75,7 @@ open class BranchedValue(
                 type: Type,
                 kotlinType: KotlinType?,
                 v: InstructionAdapter,
-                allowImplicitCast: Boolean
+                allowNoUpcast: Boolean
             ) {
                 v.iconst(1)
                 coerceTo(type, kotlinType, v)
@@ -103,7 +103,7 @@ open class BranchedValue(
                 type: Type,
                 kotlinType: KotlinType?,
                 v: InstructionAdapter,
-                allowImplicitCast: Boolean
+                allowNoUpcast: Boolean
             ) {
                 v.iconst(0)
                 coerceTo(type, kotlinType, v)
@@ -191,7 +191,7 @@ class CondJump(val condition: BranchedValue, op: Int) : BranchedValue(condition,
         type: Type,
         kotlinType: KotlinType?,
         v: InstructionAdapter,
-        allowImplicitCast: Boolean
+        allowNoUpcast: Boolean
     ) {
         throw UnsupportedOperationException("Use condJump instead")
     }

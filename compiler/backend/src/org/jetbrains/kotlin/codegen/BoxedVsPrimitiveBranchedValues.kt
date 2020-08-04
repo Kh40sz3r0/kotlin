@@ -52,7 +52,7 @@ abstract class SafeCallFusedWithPrimitiveEqualityBase(
         type: Type,
         kotlinType: KotlinType?,
         v: InstructionAdapter,
-        allowImplicitCast: Boolean
+        allowNoUpcast: Boolean
     ) {
         val falseLabel = Label()
         val endLabel = Label()

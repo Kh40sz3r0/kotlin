@@ -152,7 +152,7 @@ public class CallReceiver extends StackValue {
     }
 
     @Override
-    public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v, boolean allowImplicitCast) {
+    public void putSelector(@NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v, boolean allowNoUpcast) {
         StackValue currentExtensionReceiver = extensionReceiver;
         boolean hasExtensionReceiver = extensionReceiver != none();
         if (extensionReceiver instanceof SafeCall) {
@@ -173,7 +173,7 @@ public class CallReceiver extends StackValue {
                         hasExtensionReceiver ? kotlinType : currentExtensionReceiver.kotlinType,
                         v,
                         dispatchReceiverType.getSize(),
-                        allowImplicitCast
+                        allowNoUpcast
                 );
     }
 

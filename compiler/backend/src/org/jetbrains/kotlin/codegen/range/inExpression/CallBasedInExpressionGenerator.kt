@@ -34,7 +34,7 @@ class CallBasedInExpressionGenerator(
                 type: Type,
                 kotlinType: KotlinType?,
                 v: InstructionAdapter,
-                allowImplicitCast: Boolean
+                allowNoUpcast: Boolean
             ) {
                 invokeFunction(v)
                 coerceTo(type, kotlinType, v)

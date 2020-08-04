@@ -347,7 +347,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             @Override
             public void putSelector(
                     @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v,
-                    boolean allowImplicitCast
+                    boolean allowNoUpcast
             ) {
                 stackValueToWrap.put(functionTypeForWrapper, null, v);
                 invokeCoroutineMigrationMethod(
@@ -380,7 +380,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             @NotNull Type type,
             @Nullable KotlinType kotlinType,
             @NotNull StackValue value,
-            boolean allowImplicitCast
+            boolean allowNoUpcast
     ) {
         // for repl store the result of the last line into special field
         if (value.type != Type.VOID_TYPE) {
@@ -397,7 +397,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             }
         }
 
-        value.put(type, kotlinType, v, false, allowImplicitCast);
+        value.put(type, kotlinType, v, false, allowNoUpcast);
     }
 
     @Nullable
@@ -2482,7 +2482,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 @Override
                 public void putSelector(
                         @NotNull Type type, @Nullable KotlinType kotlinType, @NotNull InstructionAdapter v,
-                        boolean allowImplicitCast
+                        boolean allowNoUpcast
                 ) {
                     releaseContinuation.put(CoroutineCodegenUtilKt.RELEASE_CONTINUATION_ASM_TYPE, v);
                     invokeCoroutineMigrationMethod(
@@ -4608,7 +4608,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                             @NotNull Type type,
                             @Nullable KotlinType kotlinType,
                             @NotNull InstructionAdapter v,
-                            boolean allowImplicitCast
+                            boolean allowNoUpcast
                     ) {
                         metadataValue.put(type, kotlinType, v);
                     }
