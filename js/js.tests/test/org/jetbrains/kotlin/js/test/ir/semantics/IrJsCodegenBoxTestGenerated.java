@@ -13591,6 +13591,11 @@ public class IrJsCodegenBoxTestGenerated extends AbstractIrJsCodegenBoxTest {
             runTest("compiler/testData/codegen/box/localClasses/localExtendsInnerAndReferencesOuterMember.kt");
         }
 
+        @TestMetadata("localGenericWithTypeParameters.kt")
+        public void testLocalGenericWithTypeParameters() throws Exception {
+            runTest("compiler/testData/codegen/box/localClasses/localGenericWithTypeParameters.kt");
+        }
+
         @TestMetadata("nameWithWhitespace.kt")
         public void testNameWithWhitespace() throws Exception {
             runTest("compiler/testData/codegen/box/localClasses/nameWithWhitespace.kt");
